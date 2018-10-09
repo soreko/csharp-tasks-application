@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+	<Registry>
+		<!-- a specific value -->
+		<Key Name="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\APD" ValueName="DisplayVersion" />
+	</Registry>
+
+	<!-- set True or False to get specific information -->
+	<System Processes="True" Services="True" Drivers="True" SystemEnvironmentVariables="True" UserEnvironmentVariables="True"/>
+
+	<EventLog>
+		<!-- Name is the path to the required event log such as MyApp/Operational -->
+		<Log Name="Security" Filename="security.evt" /> 
+		<Log Name="Application" Filename="application.evt" /> 
+	</EventLog>
+	<Files>
+		<!-- use IncludeFile="True" to add file to resulting zip -->
+		<!-- environment variables are supported -->
+		<File Path="%SystemRoot%\temp\edr_agent_install.log" IncludeFile="True" />
+		<File Path=".\log.dec.txt" IncludeFile="True" />
+		<File Path=".\systeminfo.txt" IncludeFile="True" />
+		<File Path="%ProgramFiles%\apd\agent\data\agent_config.dat" IncludeFile="True" />
+		<File Path="%ProgramFiles%\apd\agent\data\analysis_config.dat" IncludeFile="True" />
+
+		<File Path="%programFiles%\apd\agent\logs\log.txt" IncludeFile="True" />
+		<File Path="%programFiles%\apd\agent\logs\log.txt.1" IncludeFile="True" />
+		<File Path="%programFiles%\apd\agent\logs\log.txt.2" IncludeFile="True" />
+		<File Path="%programFiles%\apd\agent\logs\log.txt.3" IncludeFile="True" />
+		<File Path="%programFiles%\apd\agent\logs\log.txt.4" IncludeFile="True" />
+
+
+		<File Path="%ProgramFiles%\apd\agent\apdagent.exe" IncludeFile="False" />
+		<File Path="%ProgramFiles%\apd\agent\Uninstaller.exe" IncludeFile="False" />
+
+		<!-- drivers -->
+		<File Path="%SystemRoot%\system32\drivers\apddll.sys" IncludeFile="False" />
+		<File Path="%SystemRoot%\system32\drivers\apdmem.sys" IncludeFile="False" />
+		<File Path="%SystemRoot%\system32\drivers\apdproc.sys" IncludeFile="False" />
+		<File Path="%SystemRoot%\system32\drivers\apdfsf.sys" IncludeFile="False" />
+		<File Path="%SystemRoot%\system32\drivers\apdnet.sys" IncludeFile="False" />
+		<File Path="%SystemRoot%\system32\drivers\apdvfs.sys" IncludeFile="False" />
+		<File Path="%SystemRoot%\system32\drivers\kdi.sys" IncludeFile="False" />
+		<File Path="%SystemRoot%\system32\drivers\kdi.sys" IncludeFile="False" />
+
+		<!-- dump -->
+		<File Path="%SystemRoot%\memory.dmp" IncludeFile="False" />
+	</Files>
+</Configuration>

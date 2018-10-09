@@ -1,0 +1,110 @@
+﻿using log4net;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AgentInfoCollector.Tasks
+{
+    public class LogToDebugTask : ITask
+    {
+        const string CHANGELOGBAT = "ChangeLogLevel.bat";
+
+        private static ILog _log = LogManager.GetLogger(nameof(LogToDebugTask));
+
+        public void Execute()
+        {
+            var minutesToDebug = int.Parse(ConfigurationManager.AppSettings["MinutesToDebug"]);
+
+            string logLevel = "DEBUG";
+
+            // change log level
+            if (ChangeLogLevel(logLevel))
+            {
+                StopAgent();
+            }            
+            
+        }
+
+        private bool ChangeLogLevel(string level)
+        {
+            var location = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            // run change log level command
+            int rc = RunCmd($@"{location}\{CHANGELOGBAT}", level);
+            
+            if (rc != 0)
+            {
+                _log.Error($"Change log level failed");
+                return false;
+            }
+            else
+            {
+                _log.Debug($"Change log level completed");
+                return true;
+            }
+        }
+
+        private void StopAgent()
+        {
+            var location = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            // run change log level command
+            _log.Debug($@"About to launch command: {location}\{CHANGELOGBAT} {level}");
+
+            ProcessStartInfo sqlCmdStartInfo = new ProcessStartInfo($@"{location}\{CHANGELOGBAT}", level)
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false
+            };
+
+            Process sqlcmdProc = Process.Start(sqlCmdStartInfo);
+
+            while (!sqlcmdProc.StandardOutput.EndOfStream)
+            {
+                _log.Debug(sqlcmdProc.StandardOutput.ReadLine());
+            }
+
+            sqlcmdProc.WaitForExit();
+
+            if (sqlcmdProc.ExitCode != 0)
+            {
+                _log.Error($"Change log level failed");
+                return false;
+            }
+            else
+            {
+                _log.Debug($"Change log level completed");
+                return true;
+            }
+        }
+
+        private int RunCmd(string fileName, string args)
+        {
+            _log.Debug($@"About to launch command: {fileName} {args}");
+
+            ProcessStartInfo sqlCmdStartInfo = new ProcessStartInfo(fileName, args)
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false
+            };
+
+            Process sqlcmdProc = Process.Start(sqlCmdStartInfo);
+
+            while (!sqlcmdProc.StandardOutput.EndOfStream)
+            {
+                _log.Debug(sqlcmdProc.StandardOutput.ReadLine());
+            }
+
+            sqlcmdProc.WaitForExit();
+
+            return sqlcmdProc.ExitCode;            
+        }
+    }
+}
